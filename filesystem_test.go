@@ -2,13 +2,14 @@ package filesystem
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/config"
+	"github.com/cloudwego/hertz/pkg/app/client"
+	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/test/assert"
-	"github.com/cloudwego/hertz/pkg/common/ut"
+	"github.com/cloudwego/hertz/pkg/protocol"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/hertz/pkg/route"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -20,14 +21,16 @@ const (
 // go test -run TestFileSystem
 func TestFileSystem(t *testing.T) {
 	t.Parallel()
-	h := route.NewEngine(config.NewOptions([]config.Option{}))
+	h := server.Default(server.WithHostPorts(":3000"))
 	h.Use(New("/test", http.Dir(fsFiles)))
-	h.Use(New("/dir", http.Dir(fsFiles)))
+	h.Use(New("/dir", http.Dir(fsFiles), WithBrowse(true)))
 	h.GET("/", func(_ context.Context, c *app.RequestContext) {
 		c.String(200, "Hello world!")
 	})
 	h.Use(New("/spatest", http.Dir(fsFiles), WithIndexFile("index.html"), WithNotFoundFile("index.html")))
 	h.Use(New("/prefix", http.Dir(fsFiles), WithPathPrefix("img")))
+	go h.Spin()
+	time.Sleep(1 * time.Second)
 
 	tests := []struct {
 		name         string
@@ -110,10 +113,13 @@ func TestFileSystem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-
-			result := ut.PerformRequest(h, consts.MethodGet, tt.url, nil).Result()
-			assert.DeepEqual(t, tt.statusCode, result.StatusCode())
-			assert.DeepEqual(t, tt.contentType, result.Header.Get("Content-Type"))
+			testClient, _ := client.NewClient()
+			req, resp := &protocol.Request{}, &protocol.Response{}
+			req.SetRequestURI(tt.url)
+			req.SetMethod(consts.MethodGet)
+			_ = testClient.Do(context.Background(), req, resp)
+			assert.DeepEqual(t, tt.statusCode, resp.StatusCode())
+			assert.DeepEqual(t, tt.contentType, resp.Header.Get("Content-Type"))
 		})
 	}
 }

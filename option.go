@@ -2,13 +2,10 @@ package filesystem
 
 import (
 	"strings"
-
-	"github.com/cloudwego/hertz/pkg/app"
 )
 
 // option defines the config for middleware.
 type option struct {
-	next         app.HandlerFunc
 	pathPrefix   string
 	browse       bool
 	index        string
@@ -74,12 +71,5 @@ func WithMaxAge(age int) Option {
 func WithNotFoundFile(path string) Option {
 	return func(o *option) {
 		o.notFoundFile = path
-	}
-}
-
-// WithCallback defines a function to skip this middleware when returned true.
-func WithCallback(next app.HandlerFunc) Option {
-	return func(o *option) {
-		o.next = next
 	}
 }

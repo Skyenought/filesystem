@@ -16,7 +16,7 @@ import (
 // New creates a new middleware handler.
 //
 // filesystem does not handle url encoded values (for example spaces)
-// on it's own.
+// on its own.
 func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc {
 	cfg := newOption(opts)
 
@@ -55,13 +55,16 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		if err != nil {
 			if os.IsNotExist(err) {
 				c.AbortWithStatus(consts.StatusNotFound)
+				return
 			}
+			c.String(consts.StatusNotFound, "failed to open: %s", err.Error())
 			hlog.Errorf("failed to open: %s", err.Error())
 			return
 		}
 
 		stat, err := file.Stat()
 		if err != nil {
+			c.String(consts.StatusInternalServerError, "failed to stat: %s", err.Error())
 			hlog.Errorf("failed to stat: %s", err)
 			return
 		}
@@ -83,16 +86,19 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		if stat.IsDir() {
 			if cfg.browse {
 				if err := dirList(c, file); err != nil {
+					c.String(consts.StatusInternalServerError, err.Error())
 					hlog.Errorf("show dirList fail, err: %s", err)
 				}
 				return
 			}
+			c.AbortWithStatus(consts.StatusForbidden)
+			return
 		}
 
 		modTime := stat.ModTime()
 		contentLength := int(stat.Size())
 
-		c.Response.Header.SetContentType(getFileExtension(stat.Name()))
+		c.Response.Header.SetContentType(getMIME(getFileExtension(stat.Name())))
 		if !modTime.IsZero() {
 			c.Response.Header.Set(consts.HeaderLastModified, modTime.UTC().Format(http.TimeFormat))
 		}
@@ -102,6 +108,7 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 				c.Response.Header.Set("Cache-Control", cacheControlStr)
 			}
 			c.Response.SetBodyStream(file, contentLength)
+			return
 		}
 
 		if method == consts.MethodHead {
@@ -109,8 +116,11 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 			c.Response.SkipBody = true
 			c.Response.Header.SetContentLength(contentLength)
 			if err := file.Close(); err != nil {
-				hlog.Errorf("failed to close: %s", err)
+				hlog.Errorf("failed to close: %s", err.Error())
+				return
 			}
+			return
 		}
+		c.Next(ctx)
 	}
 }
