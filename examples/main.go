@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"github.com/Skyenought/filesystem"
 	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
@@ -10,9 +9,6 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
-
-//go:embed testdata/fs/*
-var fs embed.FS
 
 func main() {
 	h := server.Default(
@@ -22,7 +18,7 @@ func main() {
 	h.GET("/", func(_ context.Context, c *app.RequestContext) {
 		c.String(200, "Hello World!")
 	})
-	h.Use(filesystem.New("/dir", http.Dir("./testdata/fs"),
+	h.Use(filesystem.New("/dir", http.Dir("./testdata"),
 		filesystem.WithBrowse(true)),
 	)
 	h.Spin()

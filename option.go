@@ -1,11 +1,13 @@
 package filesystem
 
 import (
+	"net/http"
 	"strings"
 )
 
 // option defines the config for middleware.
 type option struct {
+	root         http.FileSystem
 	pathPrefix   string
 	browse       bool
 	index        string
@@ -15,8 +17,9 @@ type option struct {
 
 type Option func(o *option)
 
-func newOption(opts []Option) *option {
+func newOption(root http.FileSystem, opts []Option) *option {
 	cfg := new(option)
+	cfg.root = root
 	cfg.index = "index.html"
 	for _, optionFuc := range opts {
 		optionFuc(cfg)

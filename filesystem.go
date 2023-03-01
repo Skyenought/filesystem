@@ -18,7 +18,7 @@ import (
 // filesystem does not handle url encoded values (for example spaces)
 // on its own.
 func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc {
-	cfg := newOption(opts)
+	cfg := newOption(root, opts)
 
 	var once sync.Once
 	var prefix string
@@ -48,9 +48,9 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		if len(path) > 1 {
 			path = trimRight(path, '/')
 		}
-		file, err := root.Open(path)
+		file, err := cfg.root.Open(path)
 		if err != nil && os.IsNotExist(err) && cfg.notFoundFile != "" {
-			file, err = root.Open(cfg.notFoundFile)
+			file, err = cfg.root.Open(cfg.notFoundFile)
 		}
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -72,7 +72,7 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		// Serve index if urlPrefix is directory
 		if stat.IsDir() {
 			indexPath := trimRight(path, '/') + cfg.index
-			index, err := root.Open(indexPath)
+			index, err := cfg.root.Open(indexPath)
 			if err == nil {
 				indexStat, err := index.Stat()
 				if err == nil {
