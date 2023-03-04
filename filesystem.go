@@ -54,18 +54,19 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		}
 		if err != nil {
 			if os.IsNotExist(err) {
-				c.AbortWithStatus(consts.StatusNotFound)
+				hlog.SystemLogger().Errorf("Cannot open file or Directory, path: %s, err = %s", path, err)
+				c.AbortWithMsg("Cannot open file or Directory", consts.StatusNotFound)
 				return
 			}
-			c.String(consts.StatusNotFound, "failed to open: %s", err.Error())
-			hlog.Errorf("failed to open: %s", err.Error())
+			hlog.SystemLogger().Errorf("Failed to open: %s", err)
+			c.AbortWithMsg("Cannot open file or Directory", consts.StatusNotFound)
 			return
 		}
 
 		stat, err := file.Stat()
 		if err != nil {
-			c.String(consts.StatusInternalServerError, "failed to stat: %s", err.Error())
-			hlog.Errorf("failed to stat: %s", err)
+			hlog.SystemLogger().Errorf("failed to stat: %s", err)
+			c.AbortWithMsg("failed to stat", consts.StatusInternalServerError)
 			return
 		}
 
@@ -116,7 +117,8 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 			c.Response.SkipBody = true
 			c.Response.Header.SetContentLength(contentLength)
 			if err := file.Close(); err != nil {
-				hlog.Errorf("failed to close: %s", err.Error())
+				hlog.SystemLogger().Errorf("failed to close: %s", err.Error())
+				c.AbortWithMsg("fail to close file", consts.StatusInternalServerError)
 				return
 			}
 			return
