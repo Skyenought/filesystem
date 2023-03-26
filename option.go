@@ -18,9 +18,10 @@ type option struct {
 type Option func(o *option)
 
 func newOption(root http.FileSystem, opts []Option) *option {
-	cfg := new(option)
-	cfg.root = root
-	cfg.index = "index.html"
+	cfg := &option{
+		root:  root,
+		index: "index.html",
+	}
 	for _, optionFuc := range opts {
 		optionFuc(cfg)
 	}
