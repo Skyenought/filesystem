@@ -24,6 +24,13 @@ func main() {
 	})
 	h.Use(filesystem.New("/dir", http.FS(fs),
 		filesystem.WithBrowse(true),
+		filesystem.WithPreHandler(func(ctx context.Context, c *app.RequestContext) bool {
+			get := c.Request.Header.Get("token")
+			if get != "123" {
+				return false
+			}
+			return true
+		}),
 	))
 	h.Spin()
 }

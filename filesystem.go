@@ -32,6 +32,13 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 			c.Next(ctx)
 		}
 
+		if cfg.preHandler != nil {
+			if !cfg.preHandler(ctx, c) {
+				c.AbortWithStatus(consts.StatusUnauthorized)
+				return
+			}
+		}
+
 		once.Do(func() {
 			prefix = urlPrefix
 		})

@@ -42,6 +42,13 @@ func main() {
 		filesystem.WithNotFoundFile(""), // 设置未访问到相应文件的自定义页面或数据
 		filesystem.WithIndexFile(""),    // 设置访问设置目录的主页内容的路径
 		filesystem.WithMaxAge(0),        // 设置文件响应中的Cache-Control HTTP头的值。MaxAge以秒为单位定义
+		filesystem.WithPreHandler(func(ctx context.Context, c *app.RequestContext) bool {
+			get := c.Request.Header.Get("token")
+			if get != "123" {
+				return false
+			}
+			return true
+		}), // 设置一个预处理函数, 用于在访问文件之前进行一些操作, 如果返回 false, 则不会继续访问文件
 	))
 	h.Spin()
 }

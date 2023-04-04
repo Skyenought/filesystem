@@ -1,12 +1,15 @@
 package filesystem
 
 import (
+	"context"
+	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
 	"strings"
 )
 
 // option defines the config for middleware.
 type option struct {
+	preHandler   func(c context.Context, ctx *app.RequestContext) bool
 	root         http.FileSystem
 	pathPrefix   string
 	browse       bool
@@ -75,5 +78,13 @@ func WithMaxAge(age int) Option {
 func WithNotFoundFile(path string) Option {
 	return func(o *option) {
 		o.notFoundFile = path
+	}
+}
+
+// WithPreHandler PreHandler is executed before the filesystem middleware.
+// If the handler returns false, the middleware will abort with a 401 status.
+func WithPreHandler(handler func(c context.Context, ctx *app.RequestContext) bool) Option {
+	return func(o *option) {
+		o.preHandler = handler
 	}
 }

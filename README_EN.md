@@ -43,6 +43,13 @@ func main() {
 		filesystem.WithNotFoundFile(""), // Set custom page or data for the file that has not been accessed
 		filesystem.WithIndexFile(""),    // Set the path to the home page content of the accessed setting directory
 		filesystem.WithMaxAge(0),        // Set the value for the Cache-Control HTTP-header that is set on the file response. MaxAge is defined in seconds.
+		filesystem.WithPreHandler(func(ctx context.Context, c *app.RequestContext) bool {
+			get := c.Request.Header.Get("token")
+			if get != "123" {
+				return false
+			}
+			return true
+		}), // Set a pre-processing function to perform some operations before accessing the file. If false is returned, the file will not be accessed.
 	))
 	h.Spin()
 }
