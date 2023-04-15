@@ -22,14 +22,16 @@ func main() {
 	h.GET("/", func(_ context.Context, c *app.RequestContext) {
 		c.String(200, "Hello World!")
 	})
+
 	h.Use(filesystem.New("/dir", http.FS(fs),
 		filesystem.WithBrowse(true),
-		filesystem.WithPreHandler(func(ctx context.Context, c *app.RequestContext) bool {
-			get := c.Request.Header.Get("token")
-			if get != "123" {
-				return false
+		filesystem.WithPreHandler(func(c context.Context, ctx *app.RequestContext) (bool, func()) {
+			if ctx.Request.Header.Get("token") != "123" {
+				return false, func() {
+					ctx.String(http.StatusUnauthorized, "Authorize Fail!")
+				}
 			}
-			return true
+			return true, nil
 		}),
 	))
 	h.Spin()

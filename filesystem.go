@@ -32,9 +32,16 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 			c.Next(ctx)
 		}
 
+		// Check that the request has the correct headers, and that the request is well-formed.
+		// If the request does not have the correct headers, or is malformed, return an error.
+		// Otherwise, return nil.
 		if cfg.preHandler != nil {
-			if !cfg.preHandler(ctx, c) {
-				c.AbortWithStatus(consts.StatusUnauthorized)
+			ok, customFallback := cfg.preHandler(ctx, c)
+			if !ok {
+				if customFallback == nil {
+					c.AbortWithStatus(consts.StatusUnauthorized)
+				}
+				customFallback()
 				return
 			}
 		}

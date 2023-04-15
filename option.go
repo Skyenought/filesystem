@@ -9,7 +9,7 @@ import (
 
 // option defines the config for middleware.
 type option struct {
-	preHandler   func(c context.Context, ctx *app.RequestContext) bool
+	preHandler
 	root         http.FileSystem
 	pathPrefix   string
 	browse       bool
@@ -19,6 +19,8 @@ type option struct {
 }
 
 type Option func(o *option)
+
+type preHandler func(c context.Context, ctx *app.RequestContext) (bool, func())
 
 func newOption(root http.FileSystem, opts []Option) *option {
 	cfg := &option{
@@ -82,8 +84,11 @@ func WithNotFoundFile(path string) Option {
 }
 
 // WithPreHandler PreHandler is executed before the filesystem middleware.
-// If the handler returns false, the middleware will abort with a 401 status.
-func WithPreHandler(handler func(c context.Context, ctx *app.RequestContext) bool) Option {
+// If the handler returns false, the middleware will abort with a 401 status by default.
+//
+// If the handler returns false and a custom fallback function is returned,
+// the middleware will abort with the custom fallback function.
+func WithPreHandler(handler preHandler) Option {
 	return func(o *option) {
 		o.preHandler = handler
 	}
