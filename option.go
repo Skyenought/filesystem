@@ -20,7 +20,7 @@ type option struct {
 
 type Option func(o *option)
 
-type preHandler func(c context.Context, ctx *app.RequestContext) (bool, func())
+type preHandler func(c context.Context, ctx *app.RequestContext) (func(), bool)
 
 func newOption(root http.FileSystem, opts []Option) *option {
 	cfg := &option{
