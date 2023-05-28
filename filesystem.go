@@ -15,9 +15,6 @@ import (
 )
 
 // NewFSHandler creates a new middleware handler.
-//
-// filesystem does not handle url encoded values (for example spaces)
-// on its own.
 func NewFSHandler(engine *server.Hertz, prefix string, root http.FileSystem, opts ...Option) {
 	cfg := newOption(root, opts)
 
@@ -139,7 +136,8 @@ func NewFSHandler(engine *server.Hertz, prefix string, root http.FileSystem, opt
 //
 // filesystem does not handle url encoded values (for example spaces)
 // on its own.
-// Deprecated
+//
+// Deprecated: use NewFSHandler instead.
 func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc {
 	cfg := newOption(root, opts)
 
