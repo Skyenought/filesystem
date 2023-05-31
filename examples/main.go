@@ -22,8 +22,9 @@ func main() {
 	h.GET("/", func(_ context.Context, c *app.RequestContext) {
 		c.String(200, "Hello World!")
 	})
-	filesystem.NewFSHandler(h, "/dir", http.FS(fs),
+	filesystem.NewFSHandler(h, "/dir/", http.FS(fs),
 		filesystem.WithBrowse(true),
+		filesystem.WithPathPrefix("/test"),
 	)
 	h.Use(filesystem.New("/dir", http.FS(fs),
 		filesystem.WithBrowse(true),

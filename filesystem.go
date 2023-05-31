@@ -15,9 +15,13 @@ import (
 )
 
 // NewFSHandler creates a new middleware handler.
-func NewFSHandler(engine *server.Hertz, prefix string, root http.FileSystem, opts ...Option) {
+func NewFSHandler(engine *server.Hertz, relpath string, root http.FileSystem, opts ...Option) {
+	var prefix string
+	prefix = relpath
 	cfg := newOption(root, opts)
-
+	if cfg.pathPrefix != "" && !strings.HasPrefix(cfg.pathPrefix, "/") {
+		prefix = "/" + cfg.pathPrefix
+	}
 	cacheControlStr := "public, max-age=" + strconv.Itoa(cfg.maxAge)
 
 	logicFunc := func(ctx context.Context, c *app.RequestContext) {
@@ -44,7 +48,7 @@ func NewFSHandler(engine *server.Hertz, prefix string, root http.FileSystem, opt
 		}
 
 		if cfg.pathPrefix != "" {
-			// PathPrefix already has a "/" prefix
+			// PathPrefix already has a "/" relpath
 			path = cfg.pathPrefix + path
 		}
 		if len(path) > 1 {
@@ -73,7 +77,7 @@ func NewFSHandler(engine *server.Hertz, prefix string, root http.FileSystem, opt
 			return
 		}
 
-		// Serve index if prefix is directory
+		// Serve index if relpath is directory
 		if stat.IsDir() {
 			indexPath := trimRight(path, '/') + cfg.index
 			index, err := cfg.root.Open(indexPath)
