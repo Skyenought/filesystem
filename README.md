@@ -4,13 +4,13 @@
 
 [Hertz](https://github.com/cloudwego/hertz) 的文件系统中间件，使用户可以直接使用原生的 `http.Dir`, `http.FS` 等进行静态文件的映射。
 
-安装:
+## 安装:
 
 ```shell
 go get -u github.com/Skyenought/filesystem
 ```
 
-简易使用示例:
+## 简易使用示例:
 
 ```go
 package main
@@ -27,7 +27,7 @@ func main() {
 	h.Spin()
 }
 ```
-完整使用示例
+## 完整使用示例
 
 ```go
 package main
@@ -58,3 +58,6 @@ func main() {
 ```
 使用 embed.FS 的示例[示例](./examples/main.go)
 
+## 原理
+
+使用 any 节点劫持访问路径, 并实现 FS 接口使得 hertz 直接支持直接使用原生的 `http.Dir`, `http.FS` 等实现 FS 接口的方法进行文件管理或访问
