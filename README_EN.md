@@ -4,13 +4,13 @@
 
 The file system middleware for [Hertz](https://github.com/cloudwego/hertz), which enables you to serve files from a directory.
 
-Installation:
+## Installation:
 
 ```shell
 go get -u github.com/Skyenought/filesystem
 ```
 
-Simple usage example:
+## Simple usage example:
 
 ```go
 package main
@@ -28,7 +28,7 @@ func main() {
 }
 ```
 
-Complete usage example:
+## Complete usage example:
 
 ```go
 package main
@@ -58,3 +58,7 @@ func main() {
 ```
 
 Example using embed.FS [example](./examples/main.go)
+
+## Principle
+
+Use `anyParam` to hijack the url for file path analysis, and implement the `FS` interface to support browsing or accessing files using `embed` etc.
