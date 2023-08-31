@@ -61,3 +61,11 @@ func main() {
 ## 原理
 
 使用 any 节点劫持访问路径, 并实现 FS 接口使得 hertz 直接支持直接使用原生的 `http.Dir`, `http.FS` 等实现 FS 接口的方法进行文件管理或访问
+
+## 感谢
+
+<a href="https://www.jetbrains.com">
+  <img src="./assets/jetbrains-logo.png" width="200" alt="JetBrains" />
+</a>
+
+非常 jetbrains 为本项目提供的免费的开源 license, 使得本项目可以使用 goland 进行开发, 也使得本项目的开发效率得到了极大的提升, 特此感谢 jetbrains 为开源项目提供的支持

@@ -62,3 +62,11 @@ Example using embed.FS [example](./examples/main.go)
 ## Principle
 
 Use `anyParam` to hijack the url for file path analysis, and implement the `FS` interface to support browsing or accessing files using `embed` etc.
+
+## Thanks
+
+<a href="https://www.jetbrains.com">
+  <img src="./assets/jetbrains-logo.png" width="200" alt="JetBrains" />
+</a>
+
+Thanks to jetbrains for providing a free open source license for this project, which enables this project to be developed using goland, and also greatly improves the development efficiency of this project. Thank you for supporting open source projects.
