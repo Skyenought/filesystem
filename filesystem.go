@@ -265,3 +265,7 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		c.Next(ctx)
 	}
 }
+
+func NewtestFunc() {
+
+}
