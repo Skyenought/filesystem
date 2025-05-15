@@ -2,4 +2,4 @@ module github.com/Skyenought/filesystem
 
 go 1.16
 
-require github.com/cloudwego/hertz v0.9.6
+require github.com/cloudwego/hertz v0.10.0
