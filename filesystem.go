@@ -155,6 +155,7 @@ func New(urlPrefix string, root http.FileSystem, opts ...Option) app.HandlerFunc
 		// Don't execute middleware if method != "GET" OR "HEAD"
 		if method != http.MethodGet && method != http.MethodHead {
 			c.Next(ctx)
+			return
 		}
 
 		// Check that the request has the correct headers, and that the request is well-formed.
